@@ -1,0 +1,12 @@
+{
+  "appId": "com.misssaigon.ordertracker",
+  "appName": "Miss Saigon",
+  "webDir": "www",
+  "backgroundColor": "#14171a",
+  "android": {
+    "allowMixedContent": false
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}

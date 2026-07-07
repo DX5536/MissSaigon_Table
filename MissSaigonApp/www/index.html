@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Miss Saigon – Tischplan</title>
+<meta name="theme-color" content="#14171a">
+<meta name="description" content="Offline Bestell- & Tischverwaltung für Miss Saigon">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ===== Top bar ===== -->
+  <header class="topbar">
+    <div class="brand">
+      <img src="icons/icon-96.png" alt="" class="brand-logo">
+      <div class="brand-text">
+        <span class="brand-name">Miss Saigon</span>
+        <span class="brand-sub">Tisch &amp; Bestell&#8209;Übersicht</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span id="save-indicator" class="save-indicator" title="Automatisch gespeichert">●</span>
+      <span id="clock" class="clock"></span>
+    </div>
+  </header>
+
+  <main id="view-root">
+
+    <!-- ===== FLOOR PLAN VIEW ===== -->
+    <section id="view-floor" class="view active" aria-label="Tischplan">
+      <div class="zones">
+        <div class="zone zone-outdoor">
+          <h2 class="zone-title">Außen</h2>
+          <div class="table-grid" id="grid-outdoor"></div>
+        </div>
+
+        <div class="zone zone-indoor">
+          <h2 class="zone-title">Innen</h2>
+          <div class="indoor-columns">
+            <div class="table-grid col col-a" id="grid-indoor-a"></div>
+            <div class="indoor-mid">
+              <div class="table-grid col-b" id="grid-indoor-b"></div>
+              <div class="table-grid col-c" id="grid-indoor-c"></div>
+            </div>
+            <div class="table-grid col col-d" id="grid-indoor-d"></div>
+          </div>
+        </div>
+
+        <div class="zone zone-takeaway">
+          <h2 class="zone-title">Abholung</h2>
+          <div class="table-grid" id="grid-takeaway"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ORDER VIEW (per table) ===== -->
+    <section id="view-order" class="view" aria-label="Bestellung">
+      <div class="order-header">
+        <button id="btn-back" class="icon-btn" aria-label="Zurück">←</button>
+        <div class="order-header-info">
+          <div class="order-table-name" id="order-table-name">Tisch</div>
+          <div class="order-table-seats" id="order-table-seats"></div>
+        </div>
+        <div class="order-total-box">
+          <span class="order-total-label">Gesamt</span>
+          <span class="order-total-value" id="order-total-value">0,00&nbsp;€</span>
+        </div>
+      </div>
+
+      <div class="order-body">
+        <div class="split-bar">
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-split">
+            <span>Rechnung teilen</span>
+          </label>
+          <button id="btn-clear-table" class="link-btn danger-link">Tisch leeren</button>
+        </div>
+
+        <ul id="receipt-list" class="receipt-list"></ul>
+        <div id="receipt-empty" class="receipt-empty">Noch keine Artikel. Unten hinzufügen ↓</div>
+
+        <div class="add-panel">
+          <div class="add-panel-title">Artikel hinzufügen</div>
+          <div class="search-row">
+            <input id="search-input" type="text" inputmode="text" placeholder="Nummer oder Name, z.B. 13 oder V7 Garnelen" autocomplete="off">
+            <button id="btn-clear-search" class="icon-btn" aria-label="Suche leeren">✕</button>
+          </div>
+          <div id="search-results" class="search-results"></div>
+          <div id="category-browser" class="category-browser"></div>
+
+          <div class="custom-row">
+            <div class="add-panel-title small">Sonstiger Posten</div>
+            <div class="custom-inputs">
+              <input id="custom-name" type="text" placeholder="Bezeichnung (z.B. Trinkgeld, Pfand)" autocomplete="off">
+              <input id="custom-price" type="text" inputmode="decimal" placeholder="0,00 €" autocomplete="off">
+              <button id="btn-add-custom" class="btn btn-accent">+ Hinzufügen</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="order-bottom-bar">
+        <div class="bottom-info" id="bottom-info">Gesamtbetrag</div>
+        <div class="bottom-value" id="bottom-value">0,00&nbsp;€</div>
+        <button id="btn-pay" class="btn btn-pay">Bezahlen</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Variant chooser popover (e.g. Klein/Groß) -->
+  <div id="variant-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-title" id="variant-modal-title">Variante wählen</div>
+      <div class="modal-actions" id="variant-modal-actions"></div>
+      <button class="btn btn-ghost" id="variant-modal-cancel">Abbrechen</button>
+    </div>
+  </div>
+
+  <!-- Confirm modal (clear table etc.) -->
+  <div id="confirm-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-title" id="confirm-modal-title">Bist du sicher?</div>
+      <p class="modal-text" id="confirm-modal-text"></p>
+      <div class="modal-actions modal-actions-row">
+        <button class="btn btn-ghost" id="confirm-modal-cancel">Abbrechen</button>
+        <button class="btn btn-danger" id="confirm-modal-ok">Bestätigen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+</div>
+
+<script src="js/menu.js"></script>
+<script src="js/tables.js"></script>
+<script src="js/app.js"></script>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("service-worker.js").catch(() => {
+        /* offline-first still works without SW registration succeeding */
+      });
+    });
+  }
+</script>
+</body>
+</html>

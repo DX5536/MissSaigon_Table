@@ -1,0 +1,38 @@
+name: Build Android APK
+
+# Builds the Miss Saigon Android app and attaches the .apk as a downloadable
+# artifact. Runs automatically on every push, and can also be started by
+# hand from the "Actions" tab (the "Run workflow" button).
+on:
+  push:
+    branches: ["**"]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the project
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
+
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: miss-saigon-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
