@@ -37,14 +37,14 @@ jobs:
           echo "--- installed packages ---"
           sdkmanager --list_installed || true
 
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
+
       - name: Print tool versions (for debugging)
         shell: bash
         run: |
           echo "--- java ---"; java -version
           echo "--- gradle wrapper ---"; cd android && ./gradlew -v
-
-      - name: Make gradlew executable
-        run: chmod +x android/gradlew
 
       - name: Build debug APK
         shell: bash
