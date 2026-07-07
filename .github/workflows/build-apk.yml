@@ -24,14 +24,44 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Install the exact SDK platform + build-tools this project needs
+        shell: bash
+        run: |
+          set -e
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platform-tools" \
+                     "platforms;android-36" \
+                     "build-tools;36.0.0" \
+                     "build-tools;35.0.0" \
+                     "build-tools;34.0.0" || true
+          echo "--- installed packages ---"
+          sdkmanager --list_installed || true
+
+      - name: Print tool versions (for debugging)
+        shell: bash
+        run: |
+          echo "--- java ---"; java -version
+          echo "--- gradle wrapper ---"; cd android && ./gradlew -v
+
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
       - name: Build debug APK
+        shell: bash
         working-directory: android
-        run: ./gradlew assembleDebug --no-daemon
+        run: |
+          set -o pipefail
+          ./gradlew assembleDebug --no-daemon --stacktrace --info 2>&1 | tee gradle-build.log
+
+      - name: Upload build log (always, useful even when the build succeeds)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-build-log
+          path: android/gradle-build.log
 
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: miss-saigon-debug-apk
