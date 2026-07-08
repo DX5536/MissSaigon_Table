@@ -5,7 +5,7 @@
   const MENU = window.MissSaigonMenu;
   const TABLES = window.MissSaigonTables.TABLES;
   const STORAGE_KEY = "missaigon_state_v1";
-  const HOLD_MS = 10000;
+  const HOLD_MS = 3000;
 
   // ---------------------------------------------------------------
   // State
