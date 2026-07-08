@@ -476,10 +476,23 @@ button { font-family: inherit; cursor: pointer; }
 }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-/* ================= Responsive: portrait narrow phones ================= */
+/* ================= Responsive: portrait narrow phones =================
+   Außen + Abholung sit side by side on one row (both are narrow content:
+   3 tables / 5 tickets), then Innen takes its own full-width row below,
+   so the indoor floor plan can stretch to use the whole screen width. */
 @media (orientation: portrait) {
-  .zones { flex-direction: column; }
-  .zone-outdoor, .zone-takeaway, .zone-indoor { max-width: none; flex: 1 1 auto; }
+  .zones { align-items: stretch; }
+  .zone-outdoor, .zone-takeaway {
+    flex: 0 1 48%;
+    max-width: none;
+    order: 1;
+  }
+  .zone-takeaway { order: 2; }
+  .zone-indoor {
+    flex: 1 1 100%;
+    max-width: none;
+    order: 3;
+  }
   .indoor-columns { flex-direction: row; }
 }
 
